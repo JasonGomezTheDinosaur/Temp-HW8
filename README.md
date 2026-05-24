@@ -1,45 +1,33 @@
-# ICS 46: Homework 8
+cmake_minimum_required(VERSION 3.20)
 
-Welcome to ICS 46 Homework 8! 
+project(HW8 CXX)
 
-You will be implementing graphs.
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-## 📋 Instructions
+set(GRAPH_SRC_FILES
+  src/graph.h
+  src/graph.cpp
+)
 
-Carefully follow all instructions on the course documents site [here](https://sites.google.com/view/ics-46-data-structures/homework-8).
+add_executable(main
+  ${GRAPH_SRC_FILES}
+  src/main.cpp
+)
 
-## 🛠️ Technical Details
+find_package(GTest)
+if (GTest_FOUND)
+  set(STUDENT_TEST_FILES
+    gtest/gtestmain.cpp
+    gtest/student_gtests.cpp
+  )
 
-This repository contains the starter code for your ICS46 Homework 8.
+  add_executable(student_gtests 
+    ${STUDENT_TEST_FILES}
+    ${GRAPH_SRC_FILES}
+  )
+  target_include_directories(student_gtests PRIVATE src ${GTEST_INCLUDE_DIRS})
+  target_link_libraries(student_gtests PRIVATE ${GTEST_LIBRARIES})
+endif()
 
-- Build System: CMake
-- Testing: Google Test (GTest)
-
-## Directory Structure
-
-This Homework submission should have the following directory structure:
-
-```bash
-├── CMakeLists.txt
-├── CMakePresets.json
-└── gtest
-    └── gtestmain.cpp
-    └── student_gtests.cpp
-└── src
-    └── Makefile
-    └── graph.cpp
-    └── graph.h
-    └── large.txt
-    └── largest.txt
-    └── main.cpp
-    └── medium.txt
-    └── small.txt
-```
-
-Do not rename any files or the folders `src/` or `gtest/`.
-
-## Submit to Gradescope
-
-All submissions are done on [GradeScope](https://www.gradescope.com/).
-
-Then on the course Gradescope, go to the **Homework 8** assignment, press the `Submit` button, choose the `GitHub` option, and select your `hw-8...` repository.
