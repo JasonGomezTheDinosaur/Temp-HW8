@@ -52,11 +52,11 @@ Graph Graph::sort_edges() const{
 VertexList Graph::edges_from(Vertex vertex) const{
     VertexList neighborCollection;
     for (const auto& e : *this){
-if (e.u == vertex){
+if (e.u == vertex && e.v != vertex){
 neighborCollection.push_back(e.v);
 }
 
-        else if (e.v == vertex){
+if (e.v == vertex && e.u != vertex){
 neighborCollection.push_back(e.u);
 }
     }
@@ -125,7 +125,7 @@ VertexList result;
 
 VertexList bfs(const Graph& graph, Vertex startVertex){
 VertexList result;
-    vector<bool> visited(graph.size(), false);
+    vector<bool> visited(graph.numVertices, false);
     queue<Vertex> queue;
     visited[startVertex] = true;
     queue.push(startVertex);
