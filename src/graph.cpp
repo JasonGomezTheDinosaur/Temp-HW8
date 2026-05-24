@@ -10,7 +10,7 @@ cerr << "ERROR: " << msg << endl;
 DisjointSet::DisjointSet(int numVertices){
 subsets.resize(numVertices);
 
-    for (int i = 0; i < subsets.size() - 1; i++)
+    for (int i = 0; i < subsets.size(); i++)
         makeSet(i);
 }
 
@@ -68,7 +68,7 @@ neighborCollection.push_back(e.u);
 
 EdgeList Kruskals(const Graph& G){
     DisjointSet ds(G.numVertices);
-    const Graph& sorted_edges = G.sort_edges();
+    Graph sorted_edges = G.sort_edges();
     size_t solution_size = G.numVertices - 1;
     EdgeList result;
 
@@ -105,7 +105,7 @@ void file_to_graph(string filename, Graph & G){
 
 VertexList dfs(const Graph& graph, Vertex startVertex){
 VertexList result;
-    vector<bool> visited(graph.size(), false);
+    vector<bool> visited(graph.numVertices, false);
     stack<Vertex> stk;
     visited[startVertex] = true;
     stk.push(startVertex);
