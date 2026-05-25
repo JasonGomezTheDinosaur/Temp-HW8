@@ -1,33 +1,110 @@
-cmake_minimum_required(VERSION 3.20)
-
-project(HW8 CXX)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(GRAPH_SRC_FILES
-  src/graph.h
-  src/graph.cpp
-)
-
-add_executable(main
-  ${GRAPH_SRC_FILES}
-  src/main.cpp
-)
-
-find_package(GTest)
-if (GTest_FOUND)
-  set(STUDENT_TEST_FILES
-    gtest/gtestmain.cpp
-    gtest/student_gtests.cpp
-  )
-
-  add_executable(student_gtests 
-    ${STUDENT_TEST_FILES}
-    ${GRAPH_SRC_FILES}
-  )
-  target_include_directories(student_gtests PRIVATE src ${GTEST_INCLUDE_DIRS})
-  target_link_libraries(student_gtests PRIVATE ${GTEST_LIBRARIES})
-endif()
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "common-base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build"
+        },
+        {
+            "name": "linux-base",
+            "inherits": "common-base",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [
+                        "Linux"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "linux",
+            "inherits": "linux-base",
+            "displayName": "Linux Default",
+            "description": "Default build settings for Linux using GCC & GDB in Debug mode",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Wfatal-errors -Werror=vla -ggdb -fsanitize=address,undefined -fsanitize-recover=all",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined -fsanitize-recover=all"
+            }
+        },
+        {
+            "name": "default",
+            "inherits": "linux",
+            "displayName": "OpenLab Default",
+            "description": "Default build settings for OpenLab"
+        },
+        {
+            "name": "linux-valgrind",
+            "inherits": "linux-base",
+            "displayName": "Linux Valgrind",
+            "description": "Default build for Linux but without sanitizers, so that valgrind can be used",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Wfatal-errors -Werror=vla -ggdb"
+            }
+        },
+        {
+            "name": "default-valgrind",
+            "inherits": "linux-valgrind",
+            "displayName": "OpenLab Valgrind",
+            "description": "Default build settings for OpenLab with Valgrind"
+        },
+        {
+            "name": "macos-base",
+            "inherits": "common-base",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [
+                        "macOS"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "macos",
+            "inherits": "macos-base",
+            "displayName": "MacOS Default",
+            "description": "Default build for MacOS using clang and lldb",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Wfatal-errors -Werror=vla -glldb -fsanitize=address,undefined -fsanitize-recover=all",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined -fsanitize-recover=all"
+            }
+        },
+        {
+            "name": "macos-valgrind",
+            "inherits": "macos-base",
+            "displayName": "MacOS Valgrind",
+            "description": "Default build for MacOS but without sanitizers, so that valgrind can be used",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Wfatal-errors -Werror=vla -glldb"
+            }
+        }
+    ]
+}
 

@@ -1,14 +1,156 @@
-F = -std=c++20 -Wall -Wextra -Wpedantic -Wfatal-errors
-Z = ICS46_hw8.zip
-P = graph
+#include "graph.h"
+#include <list>
 
-def: $P
+void error(string msg){
+cerr << "ERROR: " << msg << endl;
+}
 
-graph: graph.cpp main.cpp graph.h
-	g++ $F graph.cpp main.cpp -o graph
+// DISJOINT SET FUNCTIONS
 
-clean:
-	/bin/rm -f $P $Z
+DisjointSet::DisjointSet(int numVertices){
+subsets.resize(numVertices);
 
-zip: clean
-	zip $Z Makefile main.cpp graph.h graph.cpp small.txt medium.txt large.txt largest.txt
+    for (int i = 0; i < subsets.size(); i++)
+        makeSet(i);
+}
+
+void DisjointSet::makeSet(Vertex x){
+    subsets[x].parent = x;
+}
+
+Vertex DisjointSet::findSet(Vertex x){
+
+if (subsets[x].parent != x){
+subsets[x].parent = findSet(subsets[x].parent);
+    return subsets[x].parent;
+}
+    
+else
+    return x;
+}
+
+void DisjointSet::unionSets(Vertex x, Vertex y){
+x = findSet(x);
+y = findSet(y);
+    if (x == y)
+        return;
+
+    subsets[y].parent = x;
+}
+
+
+// GRAPH FUNCTIONS
+
+Graph Graph::sort_edges() const{
+    Graph newGraph = *this;
+    sort(newGraph.begin(), newGraph.end(), [](const Edge &a, const Edge &b) {
+       return a.weight < b.weight;
+            });
+    return newGraph;
+}
+
+VertexList Graph::edges_from(Vertex vertex) const{
+    VertexList neighborCollection;
+    if (vertex < 0 && vertex >= numVertices)
+        return neighborCollection;
+    for (const auto& e : *this){
+if (e.u == vertex && e.v != vertex){
+neighborCollection.push_back(e.v);
+}
+
+
+    }
+    
+    return neighborCollection;
+}
+
+// PUBLIC FUNCTIONS
+
+
+EdgeList Kruskals(const Graph& G){
+    DisjointSet ds(G.numVertices);
+    Graph sorted_edges = G.sort_edges();
+    size_t solution_size = G.numVertices - 1;
+    EdgeList result;
+
+    for (Edge e : sorted_edges){
+    Vertex uRoot = ds.findSet(e.u);
+    Vertex vRoot = ds.findSet(e.v);
+
+        if (uRoot != vRoot){
+        ds.unionSets(uRoot, vRoot);
+            result.push_back(e);
+            if (result.size() >= solution_size)
+                break;
+        }
+    }
+
+    return result;
+}
+
+int sum_weights(EdgeList const& L){
+return accumulate(L.begin(), L.end(), 0,
+    [](int sum, const Edge& e) {
+       return sum + e.weight; 
+    });
+}
+
+void file_to_graph(string filename, Graph & G){
+  ifstream MyFile(filename);
+    if (!MyFile)
+        error("Could not find input file.");
+    MyFile >> G;
+
+
+}
+
+VertexList dfs(const Graph& graph, Vertex startVertex){
+VertexList result;
+    vector<bool> visited(graph.numVertices, false);
+    stack<Vertex> stk;
+    visited[startVertex] = true;
+    stk.push(startVertex);
+    while (!stk.empty()) {
+    Vertex vertex = stk.top();
+        stk.pop();
+        result.push_back(vertex);
+
+        for (Vertex v : graph.edges_from(vertex)){
+        if (!visited[v]){
+        visited[v] = true;
+            stk.push(v);
+            }
+        }
+    }
+    return result;
+}
+
+VertexList bfs(const Graph& graph, Vertex startVertex){
+VertexList result;
+    vector<bool> visited(graph.numVertices, false);
+    queue<Vertex> queue;
+    visited[startVertex] = true;
+    queue.push(startVertex);
+
+    while (!queue.empty()){
+    Vertex vertex = queue.front();
+        queue.pop();
+        result.push_back(vertex);
+        for (Vertex v : graph.edges_from(vertex)){
+        if (!visited[v]){
+        visited[v] = true;
+            queue.push(v);
+
+        }
+        }
+    }
+    return result; 
+}
+
+string get_arg(int argc, char *argv[], string def){
+if (argc > 1)
+return argv[1];
+
+    else
+    return def;
+}
