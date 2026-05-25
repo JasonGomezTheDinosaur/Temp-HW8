@@ -51,15 +51,16 @@ Graph Graph::sort_edges() const{
 
 VertexList Graph::edges_from(Vertex vertex) const{
     VertexList neighborCollection;
+    if (vertex < 0 && vertex >= numVertices)
+        return neighborCollection;
     for (const auto& e : *this){
 if (e.u == vertex && e.v != vertex){
 neighborCollection.push_back(e.v);
 }
 
-if (e.v == vertex && e.u != vertex){
-neighborCollection.push_back(e.u);
-}
+
     }
+    
     return neighborCollection;
 }
 
@@ -113,6 +114,7 @@ VertexList result;
     Vertex vertex = stk.top();
         stk.pop();
         result.push_back(vertex);
+
         for (Vertex v : graph.edges_from(vertex)){
         if (!visited[v]){
         visited[v] = true;
